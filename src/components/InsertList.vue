@@ -1,5 +1,5 @@
 <template>
-  <div class="login">
+  <div class="InsertList">
     <el-form
       :model="ruleForm"
       status-icon
@@ -8,20 +8,24 @@
       label-width="100px"
       class="demo-ruleForm"
     >
-      <el-form-item label="用户名" prop="name">
-        <el-input v-model="ruleForm.name"></el-input>
-      </el-form-item>
-      <el-form-item label="密码" prop="pass">
+      <el-form-item label="设备编号" prop="pass">
         <el-input
-          type="password"
+          type="text"
           v-model="ruleForm.pass"
+          autocomplete="off"
+        ></el-input>
+      </el-form-item>
+      <el-form-item label="确认编号" prop="checkPass">
+        <el-input
+          type="text"
+          v-model="ruleForm.checkPass"
           autocomplete="off"
         ></el-input>
       </el-form-item>
 
       <el-form-item>
         <el-button type="primary" @click="submitForm('ruleForm')"
-          >登录</el-button
+          >上传</el-button
         >
         <el-button @click="resetForm('ruleForm')">重置</el-button>
       </el-form-item>
@@ -31,12 +35,23 @@
 
 <script>
 export default {
-  name: "login",
-  components: {},
+  name: "InsertList",
   data() {
     var validatePass = (rule, value, callback) => {
       if (value === "") {
-        callback(new Error("请输入密码"));
+        callback(new Error("请输入编号"));
+      } else {
+        if (this.ruleForm.checkPass !== "") {
+          this.$refs.ruleForm.validateField("checkPass");
+        }
+        callback();
+      }
+    };
+    var validatePass2 = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请再次输入编号"));
+      } else if (value !== this.ruleForm.pass) {
+        callback(new Error("两次输入编号不一致!"));
       } else {
         callback();
       }
@@ -44,12 +59,11 @@ export default {
     return {
       ruleForm: {
         pass: "",
-        name: ""
+        checkPass: "",
       },
       rules: {
-        pass: [{ required: true,validator: validatePass, trigger: "blur" }],
-        name: [{ required: true, message: '请输入正确用户名', trigger: 'blur' },
-            { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }]
+        pass: [{ validator: validatePass, trigger: "blur" }],
+        checkPass: [{ validator: validatePass2, trigger: "blur" }],
       },
     };
   },
@@ -57,11 +71,7 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          if(this.ruleForm.name === "yungu" && this.ruleForm.pass === "123456"){
-            this.$router.push("/dashboard");
-          }else{
-            alert("账号密码错误，请重试！");
-          }
+          alert("submit!");
         } else {
           console.log("error submit!!");
           return false;
@@ -76,18 +86,11 @@ export default {
 </script>
 
 <style scoped>
-.login {
+.InsertList {
   width: 100%;
-  height: 100%;
-  background: url(../assets/bgc.jpg) no-repeat center center;
-  display: flex;
-  justify-content: center;
-  align-content: center;
-  flex-wrap: wrap;
-}
-.demo-ruleForm {
-  width: 400px;
   height: auto;
 }
-
+.el-form {
+  margin-top: 70px;
+}
 </style>
